@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장바구니</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        .add-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .cart-items {
+            margin-bottom: 30px;
+        }
+
+        .cart-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .cart-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .item-details {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .item-price {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 1.2em;
+            margin: 0 20px;
+        }
+
+        .remove-btn {
+            width: auto;
+            padding: 8px 20px;
+            background: #ff4757;
+            font-size: 0.9em;
+            margin: 0;
+        }
+
+        .remove-btn:hover {
+            background: #ff3838;
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+        }
+
+        .total-label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .total-amount {
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            font-size: 1.1em;
+        }
+
+        .price-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .item-price {
+                margin: 10px 0;
+            }
+
+            .remove-btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛒 장바구니</h1>
+        
+        <div class="add-section">
+            <div class="form-group">
+                <label for="productSelect">제품 선택</label>
+                <select id="productSelect">
+                    <option value="">제품을 선택하세요</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="quantity">수량</label>
+                <input type="number" id="quantity" min="1" value="1">
+            </div>
+            
+            <button onclick="addToCart()">장바구니에 담기</button>
+        </div>
+        
+        <div class="cart-items" id="cartItems">
+            <div class="empty-cart">장바구니가 비어있습니다</div>
+        </div>
+        
+        <div class="total-section">
+            <div class="total-label">총 합계</div>
+            <div class="total-amount" id="totalAmount">0원</div>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 1, name: "Dr.G 레드 블레미쉬 클리어 크림", price: 6770 },
+            { id: 2, name: "할리스 아메리카노", price: 1910 },
+            { id: 3, name: "프링글스 핫앤스파이시", price: 1250 },
+            { id: 4, name: "프리미엄 에비스", price: 2230 },
+            { id: 5, name: "테라캔 355ml", price: 1000 },
+            { id: 6, name: "콘푸로스트", price: 3310 },
+            { id: 7, name: "초정탄산수", price: 490 },
+            { id: 8, name: "쫀득쫀득참붕어빵", price: 2800 },
+            { id: 9, name: "진짬뽕", price: 970 },
+            { id: 10, name: "이클립스 쿨링 소프트 캔디 레몬민", price: 560 },
+            { id: 11, name: "올인원 이뮨 비타 멀티팩", price: 24000 },
+            { id: 12, name: "오징어 짬뽕", price: 910 },
+            { id: 13, name: "에스앤피 골드 콜라겐 앰플 마스크", price: 570 },
+            { id: 14, name: "아크네스 클리어 앤 화이트 포밍워", price: 3600 },
+            { id: 15, name: "아이소이 장수진수분크림 70ml", price: 9270 },
+            { id: 16, name: "아이소이 블레미쉬 케어 업 크림", price: 11390 },
+            { id: 17, name: "아이브 콜라겐 겔마스크 수분초 젤", price: 1500 },
+            { id: 18, name: "아비브 약산성 pH 시트 마스크", price: 1000 },
+            { id: 19, name: "씨그램(라임)", price: 380 },
+            { id: 20, name: "신라면", price: 720 },
+            { id: 21, name: "스키틀즈 오리지날 45g", price: 440 },
+            { id: 22, name: "순수한면 제로 오버 12P", price: 1950 },
+            { id: 23, name: "센텔리안24 마데카 베리어 바디", price: 10000 },
+            { id: 24, name: "생유산균 이뮨", price: 10000 },
+            { id: 25, name: "새로 PET 640ml", price: 1680 },
+            { id: 26, name: "빅파이 딸기(중)", price: 1350 },
+            { id: 27, name: "뷰카 클래식 구취케어 치약 아쿠아", price: 11900 },
+            { id: 28, name: "미샤맨즈큐어그루밍센스립밤", price: 3500 },
+            { id: 29, name: "마데카솔연고", price: 2700 },
+            { id: 30, name: "리스테린 토탈케어 플러스 750ml", price: 3440 },
+            { id: 31, name: "리스테린 액 쿨민트 750ml", price: 3150 },
+            { id: 32, name: "라운드랩 1025 독도 토너 대용량", price: 9000 },
+            { id: 33, name: "라운드랩 1025 독도 로션", price: 13650 },
+            { id: 34, name: "더스템셀 골드 콜라겐 앰플 마스크", price: 570 },
+            { id: 35, name: "닭가슴살 단백질 바 베리", price: 1080 },
+            { id: 36, name: "닭가슴살 단백질 바 너츠", price: 1200 },
+            { id: 37, name: "뉴커터랩", price: 3410 },
+            { id: 38, name: "너구리(얼)", price: 790 },
+            { id: 39, name: "고추참치 100g (원터치)", price: 1030 },
+            { id: 40, name: "결콜라겐", price: 8910 },
+            { id: 41, name: "게메즈 에낙 치킨", price: 1170 },
+            { id: 42, name: "건강한순한면중16p", price: 1860 },
+            { id: 43, name: "(영외)케라시스 어드밴스드10", price: 3190 },
+            { id: 44, name: "(영외)케라시스 단백질 크림염색", price: 3730 },
+            { id: 45, name: "(영외)락토핏 키즈", price: 8900 }
+        ];
+
+        let cart = [];
+
+        // 제품 드롭다운 초기화
+        function initProductDropdown() {
+            const select = document.getElementById('productSelect');
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} - ${product.price.toLocaleString()}원`;
+                select.appendChild(option);
+            });
+        }
+
+        // 장바구니에 제품 추가
+        function addToCart() {
+            const productId = parseInt(document.getElementById('productSelect').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+
+            if (!productId) {
+                alert('제품을 선택해주세요');
+                return;
+            }
+
+            if (quantity < 1) {
+                alert('수량은 1개 이상이어야 합니다');
+                return;
+            }
+
+            const product = products.find(p => p.id === productId);
+            
+            // 이미 장바구니에 있는 제품인지 확인
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: quantity
+                });
+            }
+
+            updateCart();
+            
+            // 입력 필드 초기화
+            document.getElementById('productSelect').value = '';
+            document.getElementById('quantity').value = '1';
+        }
+
+        // 장바구니에서 제품 제거
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCart();
+        }
+
+        // 장바구니 UI 업데이트
+        function updateCart() {
+            const cartItemsDiv = document.getElementById('cartItems');
+            
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<div class="empty-cart">장바구니가 비어있습니다</div>';
+            } else {
+                cartItemsDiv.innerHTML = cart.map(item => {
+                    const itemTotal = item.price * item.quantity;
+                    return `
+                        <div class="cart-item">
+                            <div class="item-info">
+                                <div class="item-name">${item.name}</div>
+                                <div class="item-details">
+                                    개당 ${item.price.toLocaleString()}원 × ${item.quantity}개
+                                </div>
+                            </div>
+                            <div class="item-price">${itemTotal.toLocaleString()}원</div>
+                            <button class="remove-btn" onclick="removeFromCart(${item.id})">삭제</button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            updateTotal();
+        }
+
+        // 총 합계 업데이트
+        function updateTotal() {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('totalAmount').textContent = total.toLocaleString() + '원';
+        }
+
+        // 페이지 로드 시 초기화
+        initProductDropdown();
+    </script>
+</body>
+</html>
